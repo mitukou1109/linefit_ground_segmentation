@@ -4,13 +4,15 @@
 
 #include "ground_segmentation/ground_segmentation.h"
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
   ros::init(argc, argv, "ground_segmentation");
 
   ros::NodeHandle nh("~");
 
   std::string cloud_file;
-  if (nh.getParam("point_cloud_file", cloud_file)) {
+  if (nh.getParam("point_cloud_file", cloud_file))
+  {
     std::cout << "Point cloud file is \"" << cloud_file << "\"\n";
     pcl::PointCloud<pcl::PointXYZ> cloud;
     pcl::io::loadPLYFile(cloud_file, cloud);
@@ -29,13 +31,16 @@ int main(int argc, char** argv) {
     nh.param("n_threads", params.n_threads, params.n_threads);
     // Params that need to be squared.
     double r_min, r_max, max_fit_error;
-    if (nh.getParam("r_min", r_min)) {
-      params.r_min_square = r_min*r_min;
+    if (nh.getParam("r_min", r_min))
+    {
+      params.r_min_square = r_min * r_min;
     }
-    if (nh.getParam("r_max", r_max)) {
-      params.r_max_square = r_max*r_max;
+    if (nh.getParam("r_max", r_max))
+    {
+      params.r_max_square = r_max * r_max;
     }
-    if (nh.getParam("max_fit_error", max_fit_error)) {
+    if (nh.getParam("max_fit_error", max_fit_error))
+    {
       params.max_error_square = max_fit_error * max_fit_error;
     }
 
@@ -46,7 +51,8 @@ int main(int argc, char** argv) {
 
     ros::spin();
   }
-  else {
+  else
+  {
     std::cerr << "No point cloud file given\n";
   }
 }

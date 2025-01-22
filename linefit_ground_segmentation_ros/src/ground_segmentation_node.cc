@@ -8,35 +8,38 @@
 
 #include "ground_segmentation/ground_segmentation.h"
 
-class SegmentationNode {
+class SegmentationNode
+{
   ros::Publisher ground_pub_;
   ros::Publisher obstacle_pub_;
   tf2_ros::Buffer tf_buffer_;
-  tf2_ros::TransformListener tf_listener_{tf_buffer_};
+  tf2_ros::TransformListener tf_listener_{ tf_buffer_ };
   GroundSegmentationParams params_;
   GroundSegmentation segmenter_;
   std::string gravity_aligned_frame_;
 
 public:
-  SegmentationNode(ros::NodeHandle& nh,
-                   const std::string& ground_topic,
-                   const std::string& obstacle_topic,
-                   const GroundSegmentationParams& params,
-                   const bool& latch = false) : params_(params), segmenter_(params) {
+  SegmentationNode(ros::NodeHandle& nh, const std::string& ground_topic, const std::string& obstacle_topic,
+                   const GroundSegmentationParams& params, const bool& latch = false)
+    : params_(params), segmenter_(params)
+  {
     ground_pub_ = nh.advertise<pcl::PointCloud<pcl::PointXYZ>>(ground_topic, 1, latch);
     obstacle_pub_ = nh.advertise<pcl::PointCloud<pcl::PointXYZ>>(obstacle_topic, 1, latch);
     nh.param<std::string>("gravity_aligned_frame", gravity_aligned_frame_, "");
   }
 
-  void scanCallback(const pcl::PointCloud<pcl::PointXYZ>& cloud) {
+  void scanCallback(const pcl::PointCloud<pcl::PointXYZ>& cloud)
+  {
     pcl::PointCloud<pcl::PointXYZ> cloud_transformed;
 
     std::vector<int> labels;
 
     bool is_original_pc = true;
-    if (!gravity_aligned_frame_.empty()) {
+    if (!gravity_aligned_frame_.empty())
+    {
       geometry_msgs::TransformStamped tf_stamped;
-      try{
+      try
+      {
         tf_stamped = tf_buffer_.lookupTransform(gravity_aligned_frame_, cloud.header.frame_id,
                                                 pcl_conversions::fromPCL(cloud.header.stamp));
         // Remove translation part.
@@ -48,8 +51,9 @@ public:
         pcl::transformPointCloud(cloud, cloud_transformed, tf);
         is_original_pc = false;
       }
-      catch (tf2::TransformException &ex) {
-        ROS_WARN_THROTTLE(1.0, "Failed to transform point cloud into gravity frame: %s",ex.what());
+      catch (tf2::TransformException& ex)
+      {
+        ROS_WARN_THROTTLE(1.0, "Failed to transform point cloud into gravity frame: %s", ex.what());
       }
     }
 
@@ -60,16 +64,20 @@ public:
     pcl::PointCloud<pcl::PointXYZ> ground_cloud, obstacle_cloud;
     ground_cloud.header = cloud.header;
     obstacle_cloud.header = cloud.header;
-    for (size_t i = 0; i < cloud.size(); ++i) {
-      if (labels[i] == 1) ground_cloud.push_back(cloud[i]);
-      else obstacle_cloud.push_back(cloud[i]);
+    for (size_t i = 0; i < cloud.size(); ++i)
+    {
+      if (labels[i] == 1)
+        ground_cloud.push_back(cloud[i]);
+      else
+        obstacle_cloud.push_back(cloud[i]);
     }
     ground_pub_.publish(ground_cloud);
     obstacle_pub_.publish(obstacle_cloud);
   }
 };
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
   ros::init(argc, argv, "ground_segmentation");
 
   ros::NodeHandle nh("~");
@@ -90,13 +98,16 @@ int main(int argc, char** argv) {
   nh.param("n_threads", params.n_threads, params.n_threads);
   // Params that need to be squared.
   double r_min, r_max, max_fit_error;
-  if (nh.getParam("r_min", r_min)) {
-    params.r_min_square = r_min*r_min;
+  if (nh.getParam("r_min", r_min))
+  {
+    params.r_min_square = r_min * r_min;
   }
-  if (nh.getParam("r_max", r_max)) {
-    params.r_max_square = r_max*r_max;
+  if (nh.getParam("r_max", r_max))
+  {
+    params.r_max_square = r_max * r_max;
   }
-  if (nh.getParam("max_fit_error", max_fit_error)) {
+  if (nh.getParam("max_fit_error", max_fit_error))
+  {
     params.max_error_square = max_fit_error * max_fit_error;
   }
 
