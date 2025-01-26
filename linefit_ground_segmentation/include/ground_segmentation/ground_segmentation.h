@@ -25,6 +25,7 @@ struct GroundSegmentationParams
     , max_start_height(0.2)
     , sensor_height(0.2)
     , line_search_angle(0.2)
+    , debug(true)
   {
   }
 
@@ -58,6 +59,8 @@ struct GroundSegmentationParams
   double line_search_angle;
   // Number of threads.
   int n_threads;
+  // Output debug info.
+  bool debug;
 };
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;

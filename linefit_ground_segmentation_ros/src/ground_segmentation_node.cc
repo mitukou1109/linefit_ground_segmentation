@@ -30,20 +30,7 @@ public:
                             const rclcpp::NodeOptions& options = rclcpp::NodeOptions())
     : Node(node_name, namespace_, options)
   {
-    GroundSegmentationParams params;
-
-    params.visualize = declare_parameter<bool>("visualize", params.visualize);
-    params.n_bins = declare_parameter<int>("n_bins", params.n_bins);
-    params.n_segments = declare_parameter<int>("n_segments", params.n_segments);
-    params.max_dist_to_line = declare_parameter<double>("max_dist_to_line", params.max_dist_to_line);
-    params.max_slope = declare_parameter<double>("max_slope", params.max_slope);
-    params.min_slope = declare_parameter<double>("min_slope", params.min_slope);
-    params.long_threshold = declare_parameter<double>("long_threshold", params.long_threshold);
-    params.max_long_height = declare_parameter<double>("max_long_height", params.max_long_height);
-    params.max_start_height = declare_parameter<double>("max_start_height", params.max_start_height);
-    params.sensor_height = declare_parameter<double>("sensor_height", params.sensor_height);
-    params.line_search_angle = declare_parameter<double>("line_search_angle", params.line_search_angle);
-    params.n_threads = declare_parameter<int>("n_threads", params.n_threads);
+    params_.debug = declare_parameter<bool>("debug", params_.debug);
 
     // Params that need to be squared.
     const auto r_min = declare_parameter<double>("r_min", std::sqrt(params.r_min_square));
@@ -85,6 +72,8 @@ public:
         "line_search_angle", [this](const rclcpp::Parameter& p) { params_.line_search_angle = p.as_double(); }));
     parameter_callback_handles_.push_back(parameter_event_handler_->add_parameter_callback(
         "n_threads", [this](const rclcpp::Parameter& p) { params_.n_threads = p.as_int(); }));
+    parameter_callback_handles_.push_back(parameter_event_handler_->add_parameter_callback(
+        "debug", [this](const rclcpp::Parameter& p) { params_.debug = p.as_bool(); }));
 
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     tf_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf_buffer_);
