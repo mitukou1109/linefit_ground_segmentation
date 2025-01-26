@@ -30,15 +30,27 @@ public:
                             const rclcpp::NodeOptions& options = rclcpp::NodeOptions())
     : Node(node_name, namespace_, options)
   {
+    params_.visualize = declare_parameter<bool>("visualize", params_.visualize);
+    params_.n_bins = declare_parameter<int>("n_bins", params_.n_bins);
+    params_.n_segments = declare_parameter<int>("n_segments", params_.n_segments);
+    params_.max_dist_to_line = declare_parameter<double>("max_dist_to_line", params_.max_dist_to_line);
+    params_.max_slope = declare_parameter<double>("max_slope", params_.max_slope);
+    params_.min_slope = declare_parameter<double>("min_slope", params_.min_slope);
+    params_.long_threshold = declare_parameter<double>("long_threshold", params_.long_threshold);
+    params_.max_long_height = declare_parameter<double>("max_long_height", params_.max_long_height);
+    params_.max_start_height = declare_parameter<double>("max_start_height", params_.max_start_height);
+    params_.sensor_height = declare_parameter<double>("sensor_height", params_.sensor_height);
+    params_.line_search_angle = declare_parameter<double>("line_search_angle", params_.line_search_angle);
+    params_.n_threads = declare_parameter<int>("n_threads", params_.n_threads);
     params_.debug = declare_parameter<bool>("debug", params_.debug);
 
     // Params that need to be squared.
-    const auto r_min = declare_parameter<double>("r_min", std::sqrt(params.r_min_square));
-    const auto r_max = declare_parameter<double>("r_max", std::sqrt(params.r_max_square));
-    const auto max_fit_error = declare_parameter<double>("max_fit_error", std::sqrt(params.max_error_square));
-    params.r_min_square = r_min * r_min;
-    params.r_max_square = r_max * r_max;
-    params.max_error_square = max_fit_error * max_fit_error;
+    const auto r_min = declare_parameter<double>("r_min", std::sqrt(params_.r_min_square));
+    const auto r_max = declare_parameter<double>("r_max", std::sqrt(params_.r_max_square));
+    const auto max_fit_error = declare_parameter<double>("max_fit_error", std::sqrt(params_.max_error_square));
+    params_.r_min_square = r_min * r_min;
+    params_.r_max_square = r_max * r_max;
+    params_.max_error_square = max_fit_error * max_fit_error;
 
     gravity_aligned_frame_ = declare_parameter<std::string>("gravity_aligned_frame", "");
 
