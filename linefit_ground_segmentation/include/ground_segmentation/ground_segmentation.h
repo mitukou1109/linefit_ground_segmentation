@@ -18,13 +18,13 @@ struct GroundSegmentationParams
     , max_dist_to_line(0.15)
     , min_slope(0)
     , max_slope(1)
-    , n_threads(4)
     , max_error_square(0.01)
     , long_threshold(2.0)
     , max_long_height(0.1)
     , max_start_height(0.2)
     , sensor_height(0.2)
     , line_search_angle(0.2)
+    , n_threads(4)
     , debug(true)
   {
   }
@@ -38,7 +38,7 @@ struct GroundSegmentationParams
   // Number of radial bins.
   int n_bins;
   // Number of angular segments.
-  int n_segments;
+  unsigned int n_segments;
   // Maximum distance to a ground line to be classified as ground.
   double max_dist_to_line;
   // Min slope to be considered ground line.
@@ -58,7 +58,7 @@ struct GroundSegmentationParams
   // How far to search for a line in angular direction [rad].
   double line_search_angle;
   // Number of threads.
-  int n_threads;
+  unsigned int n_threads;
   // Output debug info.
   bool debug;
 };

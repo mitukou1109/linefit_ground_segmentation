@@ -188,7 +188,7 @@ void GroundSegmentation::assignClusterThread(const unsigned int& start_index, co
       {
         // Fix indices that are out of bounds.
         int index_1 = segment_index + steps;
-        while (index_1 >= params_.n_segments)
+        while (index_1 >= static_cast<int>(params_.n_segments))
           index_1 -= params_.n_segments;
         int index_2 = segment_index - steps;
         while (index_2 < 0)
