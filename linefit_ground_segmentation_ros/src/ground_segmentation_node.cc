@@ -8,8 +8,7 @@
 
 #include "ground_segmentation/ground_segmentation.h"
 
-class SegmentationNode : public rclcpp::Node
-{
+class SegmentationNode : public rclcpp::Node {
   std::shared_ptr<rclcpp::ParameterEventHandler> parameter_event_handler_;
   std::vector<std::shared_ptr<rclcpp::ParameterCallbackHandle>> parameter_callback_handles_;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr ground_pub_;
@@ -21,15 +20,13 @@ class SegmentationNode : public rclcpp::Node
   std::string gravity_aligned_frame_;
 
 public:
-  explicit SegmentationNode(const rclcpp::NodeOptions& options = rclcpp::NodeOptions())
-    : SegmentationNode("ground_segmentation", "", options)
-  {
+  explicit SegmentationNode(const rclcpp::NodeOptions& options = rclcpp::NodeOptions()) :
+      SegmentationNode("ground_segmentation", "", options) {
   }
 
   explicit SegmentationNode(const std::string& node_name, const std::string& namespace_,
-                            const rclcpp::NodeOptions& options = rclcpp::NodeOptions())
-    : Node(node_name, namespace_, options)
-  {
+                            const rclcpp::NodeOptions& options = rclcpp::NodeOptions()) :
+      Node(node_name, namespace_, options) {
     params_.visualize = declare_parameter<bool>("visualize", params_.visualize);
     params_.n_bins = declare_parameter<int>("n_bins", params_.n_bins);
     params_.n_segments = declare_parameter<int>("n_segments", params_.n_segments);
@@ -91,8 +88,7 @@ public:
     tf_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf_buffer_);
 
     rclcpp::QoS qos(1);
-    if (latch)
-    {
+    if (latch) {
       qos.transient_local();
     }
     ground_pub_ = create_publisher<sensor_msgs::msg::PointCloud2>(ground_topic, qos);
@@ -104,18 +100,15 @@ public:
         input_topic, 1, std::bind(&SegmentationNode::scanCallback, this, std::placeholders::_1), subscription_options);
   }
 
-  void scanCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg)
-  {
+  void scanCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg) {
     const auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
     pcl::fromROSMsg(*msg, *cloud);
 
     std::vector<int> labels;
 
-    if (!gravity_aligned_frame_.empty())
-    {
+    if (!gravity_aligned_frame_.empty()) {
       geometry_msgs::msg::TransformStamped tf_stamped;
-      try
-      {
+      try {
         tf_stamped = tf_buffer_->lookupTransform(gravity_aligned_frame_, msg->header.frame_id, msg->header.stamp);
         // Remove translation part.
         tf_stamped.transform.translation.x = 0;
@@ -124,8 +117,7 @@ public:
         const auto tf = tf2::transformToEigen(tf_stamped);
         pcl::transformPointCloud(*cloud, *cloud, tf.cast<float>());
       }
-      catch (tf2::TransformException& ex)
-      {
+      catch (tf2::TransformException &ex) {
         RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 1.0, "Failed to transform point cloud into gravity frame: %s",
                              ex.what());
       }
@@ -138,14 +130,10 @@ public:
     const auto obstacle_cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
     ground_cloud->header = cloud->header;
     obstacle_cloud->header = cloud->header;
-    for (size_t i = 0; i < cloud->size(); ++i)
-    {
-      if (labels[i] == 1)
-      {
+    for (size_t i = 0; i < cloud->size(); ++i) {
+      if (labels[i] == 1) {
         ground_cloud->push_back(cloud->at(i));
-      }
-      else
-      {
+      } else {
         obstacle_cloud->push_back(cloud->at(i));
       }
     }

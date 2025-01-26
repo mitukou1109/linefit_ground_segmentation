@@ -3,21 +3,17 @@
 
 #include "ground_segmentation/ground_segmentation.h"
 
-class SegmentationTestNode : public rclcpp::Node
-{
+class SegmentationTestNode : public rclcpp::Node {
 public:
-  explicit SegmentationTestNode(const rclcpp::NodeOptions& options = rclcpp::NodeOptions())
-    : SegmentationTestNode("ground_segmentation", "", options)
-  {
+  explicit SegmentationTestNode(const rclcpp::NodeOptions& options = rclcpp::NodeOptions()) :
+      SegmentationTestNode("ground_segmentation", "", options) {
   }
 
   explicit SegmentationTestNode(const std::string& node_name, const std::string& namespace_,
-                                const rclcpp::NodeOptions& options = rclcpp::NodeOptions())
-    : Node(node_name, namespace_, options)
-  {
+                                const rclcpp::NodeOptions& options = rclcpp::NodeOptions()) :
+      Node(node_name, namespace_, options) {
     std::string cloud_file;
-    if (!get_parameter("point_cloud_file", cloud_file))
-    {
+    if (!get_parameter("point_cloud_file", cloud_file)) {
       RCLCPP_ERROR(get_logger(), "No point cloud file given");
       rclcpp::shutdown();
       return;
