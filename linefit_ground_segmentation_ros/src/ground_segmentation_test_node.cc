@@ -12,14 +12,15 @@ public:
   explicit SegmentationTestNode(const std::string& node_name, const std::string& namespace_,
                                 const rclcpp::NodeOptions& options = rclcpp::NodeOptions()) :
       Node(node_name, namespace_, options) {
-    std::string cloud_file;
-    if (!get_parameter("point_cloud_file", cloud_file)) {
+    pcl::PointCloud<pcl::PointXYZ> cloud;
+    try {
+      const auto cloud_file = declare_parameter<std::string>("point_cloud_file");
+      pcl::io::loadPLYFile(cloud_file, cloud);
+    } catch (const rclcpp::exceptions::UninitializedStaticallyTypedParameterException& e) {
       RCLCPP_ERROR(get_logger(), "No point cloud file given");
       rclcpp::shutdown();
       return;
     }
-    pcl::PointCloud<pcl::PointXYZ> cloud;
-    pcl::io::loadPLYFile(cloud_file, cloud);
 
     GroundSegmentationParams params;
 
@@ -35,6 +36,7 @@ public:
     params.sensor_height = declare_parameter<double>("sensor_height", params.sensor_height);
     params.line_search_angle = declare_parameter<double>("line_search_angle", params.line_search_angle);
     params.n_threads = declare_parameter<int>("n_threads", params.n_threads);
+    params.debug = declare_parameter<bool>("debug", params.debug);
 
     // Params that need to be squared.
     const auto r_min = declare_parameter<double>("r_min", std::sqrt(params.r_min_square));
@@ -47,6 +49,7 @@ public:
     GroundSegmentation segmenter(params);
     std::vector<int> labels;
 
+    std::setvbuf(stdout, NULL, _IONBF, BUFSIZ); // Disable stdout buffering
     segmenter.segment(cloud, &labels);
   }
 };
