@@ -116,6 +116,7 @@ public:
         tf_stamped.transform.translation.z = 0;
         const auto tf = tf2::transformToEigen(tf_stamped);
         pcl::transformPointCloud(*cloud, *cloud, tf.cast<float>());
+        cloud->header.frame_id = gravity_aligned_frame_;
       }
       catch (tf2::TransformException &ex) {
         RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 1.0, "Failed to transform point cloud into gravity frame: %s",
